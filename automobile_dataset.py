@@ -12,7 +12,7 @@ plt.style.use('default')
 CURRENT OBJECTIVES:
 
 
-test branch
+
 -Create seaborn heatmap or correlation matrix (using the column pairs)
 -analyze whitch makes have certain charachteristics(Price prediciton, risk, etc.)
 -Create a for loop that can run all posssible parameter combos and analyse them for correlation
