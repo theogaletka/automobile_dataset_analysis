@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import itertools
 from pathlib import Path
+from scipy import stats
 
 
 plt.style.use('default')
@@ -26,11 +27,13 @@ def load_csv():
         raise FileNotFoundError(f"CSV not found")
     return pd.read_csv(DATA, na_values=["?"])
 
+
 #finds all data type pairs
 def find_all_pairs(columns):
     #finds all unqique pairs of data types,returns list of tuples
     combinations = list(itertools.combinations(columns, 2))
     return combinations
+
 
 #retuns price and risk or each entry, keeps rows that have valid entries for data type querry
 def return_two_values(df, val1, val2):
@@ -46,7 +49,8 @@ def return_two_values(df, val1, val2):
 #Creates scatter plot
 def scatter(x, y, title, xlabel, ylabel):  
     plt.figure(figsize = (8,8))
-    plt.scatter(x, y, alpha=0.3)
+    ax = plt.gca()
+    ax.scatter(x, y, alpha=0.3)
 
     #finds the amount of unique values
     unique_x = len(set(x))
@@ -55,6 +59,12 @@ def scatter(x, y, title, xlabel, ylabel):
     #this section creates a cap at 10 values on each axis
     #and plots the points
     #first if condition checks if the data type is numeric
+    
+    if pd.api.types.is_numeric_dtype(x) and pd.api.types.is_numeric_dtype(y):
+        ax.scatter(x, y, alpha=0.3)
+        _add_trend_line(ax, x, y)
+        
+    
     if pd.api.types.is_numeric_dtype(x):
         if unique_x <= 10:
             #shows all unique values
@@ -108,8 +118,19 @@ def two_value_scatter_plot(df, xkey, ykey):
     #scatter plot for the returned values
     scatter(xplot, yplot, title, xkey, ykey)
 
+
 #alias for two parameter scatter plot
 compare = two_value_scatter_plot
+
+#creates a linear regression line and R2 label on axis for numeric functions
+def _add_trend_line(ax, x, y):
+    slope, intercept, r, _, _ = stats.linregress(x, y)
+
+    x_line = np.linspace(x.min(), x.max(), 100)
+    y_line = slope * x_line + intercept
+    ax.plot(x_line, y_line, 'r--', label=f'y = {slope:.2f}x + {intercept:.2f}\nR² = {r**2:.3f}')
+    ax.legend(loc='best')
+    
 
 #main
 def main():
@@ -118,7 +139,7 @@ def main():
     df = load_csv()
 
     #Pick two data types to compare
-    compare(df, 'price', 'make') 
+    compare(df,'width','normalized-losses') 
 
 #runs main
 if __name__ == "__main__":
