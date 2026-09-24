@@ -54,26 +54,39 @@ def scatter(x, y, title, xlabel, ylabel):
     
     #this section creates a cap at 10 values on each axis
     #and plots the points
-    if unique_x <= 10:
-        #shows all unique values
-        x_ticks = sorted(set(x))
-        plt.xticks(x_ticks, rotation = 45)
+    #first if condition checks if the data type is numeric
+    if pd.api.types.is_numeric_dtype(x):
+        if unique_x <= 10:
+            #shows all unique values
+            x_ticks = sorted(set(x))
+            plt.xticks(x_ticks, rotation = 45)
+        
+        else: 
+            #evenly spaced subset capped at 10
+            x_min, x_max = min(x), max(x)
+            x_ticks = np.linspace(x_min, x_max, 10)
+            plt.xticks(x_ticks)
     
-    else: 
-        #evenly spaced subset capped at 10
-        x_min, x_max = min(x), max(x)
-        x_ticks = np.linspace(x_min, x_max, 10)
-        plt.xticks(x_ticks)
-
-
-    if unique_y <= 10:
-        # Show all unique values
-        y_ticks = sorted(set(y))
-        plt.yticks(y_ticks)
+    #formats non numerical data for the graph
     else:
-        # Show evenly spaced subset (cap at 10)
-        y_min, y_max = min(y), max(y)
-        y_ticks = np.linspace(y_min, y_max, 10)
+        
+        x_ticks = sorted(set(x))
+        plt.xticks(x_ticks, rotation=45, ha='right')
+
+    if pd.api.types.is_numeric_dtype(y):
+        if unique_y <= 10:
+            # Show all unique values
+            y_ticks = sorted(set(y))
+            plt.yticks(y_ticks)
+        else:
+            # Show evenly spaced subset (cap at 10)
+            y_min, y_max = min(y), max(y)
+            y_ticks = np.linspace(y_min, y_max, 10)
+            plt.yticks(y_ticks)
+    
+    #formats non numerical data for y axis
+    else:
+        y_ticks = sorted(set(y))
         plt.yticks(y_ticks)
 
     plt.xlabel(xlabel)
@@ -82,7 +95,6 @@ def scatter(x, y, title, xlabel, ylabel):
     plt.grid(True, alpha=0.3)
     plt.show()
 
-    return 
 
 #Program for creating a two dimensional scatter plot
 def two_value_scatter_plot(df, xkey, ykey):
@@ -106,7 +118,7 @@ def main():
     df = load_csv()
 
     #Pick two data types to compare
-    compare(df, 'price', 'engine-size') 
+    compare(df, 'price', 'make') 
 
 #runs main
 if __name__ == "__main__":
